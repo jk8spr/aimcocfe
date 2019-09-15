@@ -1,7 +1,7 @@
-export class Question {
+export interface Question {
   id: number;
-  quextext: string;
+  quexText: string;
   level: string;
-  quexid: string;
+  quexId: string;
 }
 

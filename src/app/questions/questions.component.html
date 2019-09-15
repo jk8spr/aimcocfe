@@ -1,26 +1,36 @@
-<script>$(':checkbox').checkboxpicker();</script>
 
-<div class="split left">
+<!-- Attestation questions -->
+<div class="splitLeft">
   <div class="leftjust">
-    <h3>Attestation</h3>
+     <h4>Attestation</h4>
     <form [formGroup]="form" (ngSubmit)="submit()">
-      <div class="checkbox" formArrayName="questions" *ngFor="let question of form.controls['questions'].controls; let i = index">
-        &nbsp; <b>{{questionList[i].quexid}}</b> - {{questionList[i].quextext}} <br>
-        <!-- <label>&nbsp;<input type="checkbox" [formControlName]="i">&nbsp; <b>Yes</b></label> -->
-        <mat-checkbox class = "tp-margin" [formControlName]="i">Yes</mat-checkbox>
+      <div class="table-responsive">
+        <table class="table mb-0"
+               formArrayName="questions"
+               *ngIf="questionList && questionList.length">
+          <tbody>
+            <tr *ngFor="let question of questionList; let i = index">
+              <td>
+                  <mat-checkbox class = "tp-margin" [formControlName]="i">Yes</mat-checkbox>
+              </td>
+              <td>
+                 {{question.quexId}}
+              </td>
+              <td>
+                  {{question.quexText}}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <button class="btn btn-outline-primary btn-sm">submit</button>
       </div>
-      <br>
-      <br>
-
-      <!-- <button [disabled]="!form.valid">submit</button> -->
-      <button class="btn btn-outline-primary btn-sm">submit</button>
-      <!-- <div *ngIf="!form.valid">At least one order must be selected</div> -->
     </form>
   </div>
 </div>
 
-<div class="split right">
-  <div class="upper">
+<!-- CoC Input Criteria -->
+<div class="splitRight">
+  <div class="upperRight">
       <div class="centered">
         <h4>Scenario Criteria</h4>
         <mat-form-field>
@@ -28,19 +38,25 @@
           <mat-datepicker-toggle matSuffix [for] = "picker1"></mat-datepicker-toggle>
           <mat-datepicker #picker1></mat-datepicker>
         </mat-form-field>
+        <br>
         <mat-form-field>
           <input matInput [matDatepicker] = "picker2" placeholder = "Choose a Date of Service">
           <mat-datepicker-toggle matSuffix [for] = "picker2"></mat-datepicker-toggle>
           <mat-datepicker #picker2></mat-datepicker>
         </mat-form-field>
+        <br>
         <mat-form-field>
-          <input matInput [matDatepicker] = "picker3" placeholder = "Choose a Program Start Date">
+          <input matInput [matDatepicker] = "picker3" placeholder = "Choose a Prg Start Date">
           <mat-datepicker-toggle matSuffix [for] = "picker3"></mat-datepicker-toggle>
           <mat-datepicker #picker3></mat-datepicker>
         </mat-form-field>
+        <br>
+        <button class="btn btn-outline-primary btn-sm" (click)="CheckAndReload()">Get Qs and Reset</button>
     </div>
   </div>
-  <div class="lower">
+
+  <!-- CoC Results -->
+  <div class="lowerRight">
     <div class="centered">
           <h4>CoC Results</h4>
           {{cocResult}}

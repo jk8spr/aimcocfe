@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, FormControl, ValidatorFn  } from '@angular/forms';
+import { RestApiService } from '../../services/rest-api.service';
+import { Question } from '../models/question';
 import { of } from 'rxjs';
-import { RestApiService } from '../shared/rest-api.service';
 
 @Component({
   selector: 'app-questions',
@@ -10,33 +11,43 @@ import { RestApiService } from '../shared/rest-api.service';
 })
 export class QuestionsComponent implements OnInit {
   form: FormGroup;
-  questionList: any = [];
+  questionList: Question[];
   cocResult: string;
   checked = false;
   indeterminate = false;
   labelPosition = 'after';
   disabled = false;
 
-  constructor(private formBuilder: FormBuilder, public restApi: RestApiService) {
+  constructor(
+    private formBuilder: FormBuilder,
+    public restApi: RestApiService) {
     this.form = this.formBuilder.group({
-      questions: new FormArray([], minSelectedCheckboxes(1))
+      questions: new FormArray([], minSelectedCheckboxes(0))
     });
     this.cocResult = 'Undetermined';
 
-    // async questions
-    of(this.getQuestions()).subscribe(questions => {
-      this.questionList = questions;
-      this.addCheckboxes();
-    });
   }
 
   ngOnInit() {
     // this.loadQuestions();
+    this.loadQuestionsAsync();
   }
 
   loadQuestions() {
-    return this.restApi.getQuestions().subscribe((data: {}) => {
-      this.questionList = data;
+    return this.restApi.getQuestions().subscribe(questions => {
+      this.questionList = questions;
+      this.addCheckboxes();
+      console.log(JSON.stringify(questions));
+    },
+    error => { this.questionList = []; }
+    );
+  }
+
+  loadQuestionsAsync() {
+    this.restApi.getQuestionsAsync().then(questions => {
+        this.questionList = questions;
+        this.addCheckboxes();
+        console.log(JSON.stringify(questions));
     });
   }
 
@@ -55,17 +66,10 @@ export class QuestionsComponent implements OnInit {
     this.cocResult = 'Met / Not Met';
   }
 
-  getQuestions() {
-    return [
-      { id: 100, quextext: 'Have these services been requested, approved, and rendered for this member in the past?', level: '1', quexid: 'A' },
-      { id: 200, quextext: 'Did this members treatment did not previously require prior-authorization from BCBS Massachusetts or their prior insurance carrier, and benefits were received?', level: '1', quexid: 'B' },
-      { id: 300, quextext: 'Have these services been requested, approved, and rendered for this member in the past?', level: '2', quexid: '1' },
-      { id: 400, quextext: 'Reword this Changes to the member’s treatment, including  additions, removals, or changes in administration of the drugs included in the regimen are not being submitted on this request.', level: '2', quexid: '2' },
-      { id: 500, quextext: 'The member could have reasonably relied on a previous approval to continue services and it will be detrimental to the member if continuation of the services is not approved', level: '2', quexid: '3' },
-      { id: 600, quextext: 'Interruption of the services could potentially alter the progression of the condition or disease', level: '2', quexid: '4' },
-      { id: 700, quextext: 'Continuation of the services will allow an appropriate transition of care', level: '2', quexid: '5' }
-      ];
+  CheckAndReload(): void {
+    console.log('Hello Friend');
   }
+
 }
 
 function minSelectedCheckboxes(min = 1) {
