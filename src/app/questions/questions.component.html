@@ -4,6 +4,9 @@
   <div class="leftjust">
      <h4>Attestation</h4>
     <form [formGroup]="form" (ngSubmit)="submit()">
+      <div *ngIf="!questionList">
+        <p><b>One moment while I'm loading your questions...</b></p>
+      </div>
       <div class="table-responsive">
         <table class="table mb-0"
                formArrayName="questions"
