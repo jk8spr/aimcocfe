@@ -63,10 +63,15 @@
   <div class="lowerRight">
     <div class="centered">
           <h4>CoC Results</h4>
+          <div *ngIf="!cocResult">Undetermined</div>
           {{cocResult}}
     </div>
   </div>
 </div>
-
+<div>
+    <div *ngIf="!cocResult"><img class="resultIcon" src="../assets/images/questionmark.png" /></div>
+    <div *ngIf="badgeflag"><img class="resultIcon" src="../assets/images/greenY.png" /></div>
+    <div *ngIf="cocResult && !badgeflag"><img class="resultIcon" src="../assets/images/redX.png"/></div>
+</div>
 
 

@@ -67,6 +67,13 @@ p {
   background-color: whitesmoke;
 }
 .lowerRight {
+  padding: 3px;
+  margin: 4px;
   background-color: gainsboro;
 }
 
+.resultIcon {
+  margin: 10px;
+  padding: 0px;
+  width: 28px;
+}

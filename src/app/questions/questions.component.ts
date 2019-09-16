@@ -17,6 +17,7 @@ export class QuestionsComponent implements OnInit {
   indeterminate = false;
   labelPosition = 'after';
   disabled = false;
+  badgeflag: boolean;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -24,8 +25,7 @@ export class QuestionsComponent implements OnInit {
     this.form = this.formBuilder.group({
       questions: new FormArray([], minSelectedCheckboxes(0))
     });
-    this.cocResult = 'Undetermined';
-
+    this.badgeflag = false;
   }
 
   ngOnInit() {
@@ -39,7 +39,7 @@ export class QuestionsComponent implements OnInit {
       this.addCheckboxes();
       console.log(JSON.stringify(questions));
     },
-    error => { this.questionList = []; }
+      error => { this.questionList = []; }
     );
   }
 
@@ -63,7 +63,8 @@ export class QuestionsComponent implements OnInit {
       .map((v, i) => v ? this.questionList[i] : null )
       .filter(v => v !== null);
     console.log(selectedQuestionIds);
-    this.cocResult = 'Met / Not Met';
+    this.cocResult = 'Met / Admin';
+    this.badgeflag = true;
   }
 
   CheckAndReload(): void {
