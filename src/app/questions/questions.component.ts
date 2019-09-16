@@ -58,6 +58,12 @@ export class QuestionsComponent implements OnInit {
     });
   }
 
+  private resetCheckboxes() {
+    this.questionList.forEach((o, i) =>  {
+
+    });
+  }
+
   submit() {
     const selectedQuestionIds = this.form.value.questions
       .map((v, i) => v ? this.questionList[i] : null )
@@ -68,7 +74,12 @@ export class QuestionsComponent implements OnInit {
   }
 
   CheckAndReload(): void {
+    this.questionList = [];
+    this.form = this.formBuilder.group({
+      questions: new FormArray([], minSelectedCheckboxes(0))
+    });
     console.log('Hello Friend');
+    this.loadQuestionsAsync();
   }
 
 }

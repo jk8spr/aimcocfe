@@ -1,6 +1,6 @@
 
 <!-- Attestation questions -->
-<div class="splitLeft">
+<div class="splitRight">
   <div class="leftjust">
      <h4>Attestation</h4>
     <form [formGroup]="form" (ngSubmit)="submit()">
@@ -32,7 +32,7 @@
 </div>
 
 <!-- CoC Input Criteria -->
-<div class="splitRight">
+<div class="splitLeft" >
   <div class="upperRight">
       <div class="centered">
         <h4>Scenario Criteria</h4>
@@ -54,7 +54,7 @@
           <mat-datepicker #picker3></mat-datepicker>
         </mat-form-field>
         <br>
-        <button class="btn btn-outline-primary btn-sm" (click)="CheckAndReload()">Get Qs and Reset</button>
+        <button class="btn btn-outline-primary btn-sm" (click)="CheckAndReload()">Get Qs and Reload</button>
     </div>
     <br>
   </div>

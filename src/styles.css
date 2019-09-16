@@ -50,15 +50,15 @@ p {
   opacity: 0.8;
 }
 
-.splitLeft {
-  float: left;
-  width: 60%;
+.splitRight {
+  float: right;
+  width: 65%;
   padding: 10px;
   font-size: 13px;
 }
-.splitRight {
-  overflow: hidden;
-  width: 40%;
+.splitLeft {
+  overflow: auto;
+  width: 35%;
   padding: 10px;
   background-color: whitesmoke;
   font-size: 13px;
