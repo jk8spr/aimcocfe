@@ -34,25 +34,27 @@
 <!-- CoC Input Criteria -->
 <div class="splitLeft" >
   <div class="upperRight">
-      <div class="centered">
+      <div class="centered" [formGroup]="form" >
         <h4>Scenario Criteria</h4>
         <mat-form-field>
-          <input matInput [matDatepicker] = "picker1" placeholder = "Choose a Date of Entry">
+          <input matInput [matDatepicker] = "picker1" placeholder = "Entry Date" formControlName="dateEntry">
           <mat-datepicker-toggle matSuffix [for] = "picker1"></mat-datepicker-toggle>
           <mat-datepicker #picker1></mat-datepicker>
         </mat-form-field>
         <br>
         <mat-form-field>
-          <input matInput [matDatepicker] = "picker2" placeholder = "Choose a Date of Service">
+          <input matInput [matDatepicker] = "picker2" placeholder = "Date of Service" formControlName="dateOS">
           <mat-datepicker-toggle matSuffix [for] = "picker2"></mat-datepicker-toggle>
           <mat-datepicker #picker2></mat-datepicker>
         </mat-form-field>
         <br>
         <mat-form-field>
-          <input matInput [matDatepicker] = "picker3" placeholder = "Choose a Prg Start Date">
+          <input matInput [matDatepicker] = "picker3" placeholder = "Program Start Date" formControlName="datePrgStart">
           <mat-datepicker-toggle matSuffix [for] = "picker3"></mat-datepicker-toggle>
           <mat-datepicker #picker3></mat-datepicker>
         </mat-form-field>
+        <br>
+        <mat-checkbox class = "tp-margin" #mnFlag [formControl]="bool">MN Flag</mat-checkbox>
         <br>
         <button class="btn btn-outline-primary btn-sm" (click)="CheckAndReload()">Get Qs and Reload</button>
     </div>

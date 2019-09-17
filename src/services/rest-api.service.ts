@@ -12,8 +12,11 @@ export class RestApiService {
   // Define API
   apiURL = 'https://cocapi.azurewebsites.net';
   asyncResult: Question[];
+  tCnt: number;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {
+    this.tCnt = 0;
+  }
 
   // Http Options
   httpOptions = {
@@ -25,16 +28,37 @@ export class RestApiService {
   async getQuestionsAsync() {
     this.asyncResult = await this.http.get<Question[]>(this.apiURL + '/api/coc/').toPromise();
     console.log('No issues, I will wait until promise is resolved..');
+    console.log('Get Results - ' + this.asyncResult.length);
     return this.asyncResult;
   }
 
-  getQuestionsObservable(): Observable<Question[]> {
-    return this.http.get<Question[]>(this.apiURL + '/api/coc/')
-    .pipe(
-      retry(1),
-      catchError(this.handleError)
-    );
+  async getQuestionsWithCriteriaAsync(dEntry: Date, dOS: Date, dPS: Date, mnFlag: boolean) {
+    console.log('url passed - ' + this.apiURL + '/api/coc' +
+    '/' + dPS.toISOString() +
+    '/' + dEntry.toISOString() +
+    '/' + dOS.toISOString() +
+    '/' + mnFlag);
+    this.asyncResult = await this.http.get<Question[]>(this.apiURL + '/api/coc' +
+    '/' + dPS.toISOString() +
+    '/' + dEntry.toISOString() +
+    '/' + dOS.toISOString() +
+    '/' + mnFlag).toPromise();
+    console.log('No issues, I will wait until promise is resolved..');
+    console.log('Get Results - ' + this.asyncResult.length);
+    // console.log('tCnt - ' + this.tCnt);
+    // this.asyncResult.splice(this.tCnt, 1);
+    // this.tCnt++;
+    // console.log('Splice Results - ' + this.asyncResult.length);
+    return this.asyncResult;
   }
+
+  // getQuestionsObservable(): Observable<Question[]> {
+  //   return this.http.get<Question[]>(this.apiURL + '/api/coc/')
+  //   .pipe(
+  //     retry(1),
+  //     catchError(this.handleError)
+  //   );
+  // }
 
   getQuestions() {
     return this.http.get<Question[]>(this.apiURL + '/api/coc/')

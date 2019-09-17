@@ -12,6 +12,12 @@ import { of } from 'rxjs';
 export class QuestionsComponent implements OnInit {
   form: FormGroup;
   questionList: Question[];
+  // date = new FormControl(new Date());
+  dateEntry = new Date();
+  dateOS = new Date();
+  datePrgStart = new Date();
+  mnFlag = false;
+  bool = new FormControl(false);
   cocResult: string;
   checked = false;
   indeterminate = false;
@@ -23,7 +29,11 @@ export class QuestionsComponent implements OnInit {
     private formBuilder: FormBuilder,
     public restApi: RestApiService) {
     this.form = this.formBuilder.group({
-      questions: new FormArray([], minSelectedCheckboxes(0))
+      questions: new FormArray([], minSelectedCheckboxes(0)),
+      dateOS: new FormControl(new Date('7/11/2021')),
+      dateEntry: new FormControl(new Date('7/10/2021')),
+      datePrgStart: new FormControl(new Date('1/1/2021')),
+      badgeflag: false
     });
     this.badgeflag = false;
   }
@@ -33,22 +43,38 @@ export class QuestionsComponent implements OnInit {
     this.loadQuestionsAsync();
   }
 
-  loadQuestions() {
-    return this.restApi.getQuestions().subscribe(questions => {
-      this.questionList = questions;
-      this.addCheckboxes();
-      console.log(JSON.stringify(questions));
-    },
-      error => { this.questionList = []; }
-    );
-  }
+  // loadQuestions() {
+  //   return this.restApi.getQuestions().subscribe(questions => {
+  //     this.questionList = questions;
+  //     this.addCheckboxes();
+  //     // console.log(JSON.stringify(questions));
+  //   },
+  //     error => { this.questionList = []; }
+  //   );
+  // }
 
   loadQuestionsAsync() {
     this.restApi.getQuestionsAsync().then(questions => {
         this.questionList = questions;
         this.addCheckboxes();
-        console.log(JSON.stringify(questions));
-    });
+        // console.log(JSON.stringify(questions));
+        console.log('loadQuestions Results - ' + questions.length);
+      });
+  }
+
+  loadQuestionsWithCriteriaAsync() {
+    // this.dateEntry = this.form.value..dateEntry;
+    // this.dateOS = this.form.value.dateOS;
+    // this.datePrgStart = this.form.value.datePrgStart;
+    this.restApi.getQuestionsWithCriteriaAsync(this.dateEntry,
+      this.dateOS,
+      this.datePrgStart,
+      this.mnFlag).then(questions => {
+        this.questionList = questions;
+        this.addCheckboxes();
+        // console.log(JSON.stringify(questions));
+        console.log('loadQuestions Results - ' + questions.length);
+      });
   }
 
   private addCheckboxes() {
@@ -59,8 +85,8 @@ export class QuestionsComponent implements OnInit {
   }
 
   private resetCheckboxes() {
-    this.questionList.forEach((o, i) =>  {
-
+    this.form = this.formBuilder.group({
+      questions: new FormArray([], minSelectedCheckboxes(0))
     });
   }
 
@@ -74,12 +100,10 @@ export class QuestionsComponent implements OnInit {
   }
 
   CheckAndReload(): void {
+    console.log('dateEntry.value - ' + this.dateEntry);
     this.questionList = [];
-    this.form = this.formBuilder.group({
-      questions: new FormArray([], minSelectedCheckboxes(0))
-    });
-    console.log('Hello Friend');
-    this.loadQuestionsAsync();
+    this.loadQuestionsWithCriteriaAsync();
+    this.resetCheckboxes();
   }
 
 }
