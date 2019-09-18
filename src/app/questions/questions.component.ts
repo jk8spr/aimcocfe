@@ -63,13 +63,28 @@ export class QuestionsComponent implements OnInit {
   }
 
   loadQuestionsWithCriteriaAsync() {
-    // this.dateEntry = this.form.value..dateEntry;
-    // this.dateOS = this.form.value.dateOS;
-    // this.datePrgStart = this.form.value.datePrgStart;
+    this.dateEntry = this.form.value.dateEntry;
+    this.dateOS = this.form.value.dateOS;
+    this.datePrgStart = this.form.value.datePrgStart;
     this.restApi.getQuestionsWithCriteriaAsync(this.dateEntry,
       this.dateOS,
       this.datePrgStart,
       this.mnFlag).then(questions => {
+        this.questionList = questions;
+        this.addCheckboxes();
+        // console.log(JSON.stringify(questions));
+        console.log('loadQuestions Results - ' + questions.length);
+      });
+  }
+
+  loadQuestionsWithCriteria() {
+    this.dateEntry = this.form.value.dateEntry;
+    this.dateOS = this.form.value.dateOS;
+    this.datePrgStart = this.form.value.datePrgStart;
+    this.restApi.getQuestionsWithCriteria(this.dateEntry,
+      this.dateOS,
+      this.datePrgStart,
+      this.mnFlag).subscribe(questions => {
         this.questionList = questions;
         this.addCheckboxes();
         // console.log(JSON.stringify(questions));
@@ -86,7 +101,11 @@ export class QuestionsComponent implements OnInit {
 
   private resetCheckboxes() {
     this.form = this.formBuilder.group({
-      questions: new FormArray([], minSelectedCheckboxes(0))
+      questions: new FormArray([], minSelectedCheckboxes(0)),
+      dateOS: new FormControl(new Date('7/11/2021')),
+      dateEntry: new FormControl(new Date('7/10/2021')),
+      datePrgStart: new FormControl(new Date('1/1/2021')),
+      badgeflag: false
     });
   }
 
@@ -102,7 +121,7 @@ export class QuestionsComponent implements OnInit {
   CheckAndReload(): void {
     console.log('dateEntry.value - ' + this.dateEntry);
     this.questionList = [];
-    this.loadQuestionsWithCriteriaAsync();
+    this.loadQuestionsWithCriteria();
     this.resetCheckboxes();
   }
 

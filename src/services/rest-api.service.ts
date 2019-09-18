@@ -33,6 +33,7 @@ export class RestApiService {
   }
 
   async getQuestionsWithCriteriaAsync(dEntry: Date, dOS: Date, dPS: Date, mnFlag: boolean) {
+    console.log('starting getQuestionsWithCriteriaAsync');
     console.log('url passed - ' + this.apiURL + '/api/coc' +
     '/' + dPS.toISOString() +
     '/' + dEntry.toISOString() +
@@ -42,7 +43,7 @@ export class RestApiService {
     '/' + dPS.toISOString() +
     '/' + dEntry.toISOString() +
     '/' + dOS.toISOString() +
-    '/' + mnFlag).toPromise();
+    '/' + mnFlag).pipe(catchError(this.handleError)).toPromise();
     console.log('No issues, I will wait until promise is resolved..');
     console.log('Get Results - ' + this.asyncResult.length);
     // console.log('tCnt - ' + this.tCnt);
@@ -50,6 +51,31 @@ export class RestApiService {
     // this.tCnt++;
     // console.log('Splice Results - ' + this.asyncResult.length);
     return this.asyncResult;
+  }
+
+  getQuestionsWithCriteria(dEntry: Date, dOS: Date, dPS: Date, mnFlag: boolean) {
+    console.log('starting getQuestionsWithCriteriaAsync');
+    console.log('/' + dPS.toISOString());
+    console.log('/' + dEntry.toISOString());
+    console.log('/' + dOS.toISOString());
+
+    console.log('url passed - ' + this.apiURL + '/api/coc' +
+    '/' + dPS.toISOString() +
+    '/' + dEntry.toISOString() +
+    '/' + dOS.toISOString() +
+    '/' + mnFlag);
+    return this.http.get<Question[]>(this.apiURL + '/api/coc' +
+    '/' + dPS.toISOString() +
+    '/' + dEntry.toISOString() +
+    '/' + dOS.toISOString() +
+    '/' + mnFlag).pipe(catchError(this.handleError));
+    // console.log('No issues, I will wait until promise is resolved..');
+    // console.log('Get Results - ' + this.asyncResult.length);
+    // console.log('tCnt - ' + this.tCnt);
+    // this.asyncResult.splice(this.tCnt, 1);
+    // this.tCnt++;
+    // console.log('Splice Results - ' + this.asyncResult.length);
+    // return this.asyncResult;
   }
 
   // getQuestionsObservable(): Observable<Question[]> {
