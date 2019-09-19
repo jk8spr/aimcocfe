@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, FormControl, ValidatorFn  } from '@angular/forms';
 import { RestApiService } from '../../services/rest-api.service';
 import { Question } from '../models/question';
+import { CocResult } from '../models/coCResult';
 import { of } from 'rxjs';
 
 @Component({
@@ -12,6 +13,7 @@ import { of } from 'rxjs';
 export class QuestionsComponent implements OnInit {
   form: FormGroup;
   questionList: Question[];
+  EvalResults: CocResult;
   // date = new FormControl(new Date());
   dateEntry = new Date();
   dateOS = new Date();
@@ -24,6 +26,7 @@ export class QuestionsComponent implements OnInit {
   labelPosition = 'after';
   disabled = false;
   badgeflag: boolean;
+  levelClinical: string;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -36,11 +39,13 @@ export class QuestionsComponent implements OnInit {
       badgeflag: false
     });
     this.badgeflag = false;
+    this.EvalResults = { coCDetermination: '', levelOne: '', levelTwo: '', levelThree: '', badgeFlag: null, extra: ''};
+    this.levelClinical = 'Not Met';
   }
 
   ngOnInit() {
     // this.loadQuestions();
-    this.loadQuestionsAsync();
+    this.loadQuestionsWithCriteriaAsync();
   }
 
   // loadQuestions() {
@@ -73,7 +78,7 @@ export class QuestionsComponent implements OnInit {
         this.questionList = questions;
         this.addCheckboxes();
         // console.log(JSON.stringify(questions));
-        console.log('loadQuestions Results - ' + questions.length);
+        console.log('loadQuestionsWithCriteriaAsync Results - ' + questions.length);
       });
   }
 
@@ -88,25 +93,25 @@ export class QuestionsComponent implements OnInit {
         this.questionList = questions;
         this.addCheckboxes();
         // console.log(JSON.stringify(questions));
-        console.log('loadQuestions Results - ' + questions.length);
+        console.log('loadQuestionsWithCriteria Results - ' + questions.length);
       });
   }
 
   private addCheckboxes() {
     this.questionList.forEach((o, i) => {
-      const control = new FormControl();
+      const control = new FormControl(i < 0);
       (this.form.controls.questions as FormArray).push(control);
     });
   }
 
+  private unCheckAll() {
+    this.form.controls.questions.setValue(
+        this.form.controls.questions.value
+            .map(value => false));
+  }
+
   private resetCheckboxes() {
-    this.form = this.formBuilder.group({
-      questions: new FormArray([], minSelectedCheckboxes(0)),
-      dateOS: new FormControl(new Date('7/11/2021')),
-      dateEntry: new FormControl(new Date('7/10/2021')),
-      datePrgStart: new FormControl(new Date('1/1/2021')),
-      badgeflag: false
-    });
+    console.log('in reset');
   }
 
   submit() {
@@ -114,15 +119,34 @@ export class QuestionsComponent implements OnInit {
       .map((v, i) => v ? this.questionList[i] : null )
       .filter(v => v !== null);
     console.log(selectedQuestionIds);
-    this.cocResult = 'Met / Admin';
-    this.badgeflag = true;
+    this.restApi.getCoCResultAsync(selectedQuestionIds).then(x => {
+      this.EvalResults = x;
+      this.EvalResults.levelOne = x.levelOne;
+      if (x.levelTwo === 'Met' && x.levelThree === 'Met') {
+        this.levelClinical = 'Met';
+      } else {
+        this.levelClinical = 'Not Met'; }
+      console.log('coc jk Results - ' + JSON.stringify(x));
+      console.log(x.levelOne);
+      console.log(x.levelTwo);
+      console.log(x.levelThree);
+      console.log(x.coCDetermination);
+      console.log(x.badgeFlag);
+
+      this.cocResult = this.EvalResults.levelOne + ' / ' +
+                       this.levelClinical + ' / ' +
+                       this.EvalResults.coCDetermination;
+      this.badgeflag = this.EvalResults.badgeFlag;
+      console.log('done with submit');
+      this.unCheckAll();
+    });
   }
 
   CheckAndReload(): void {
     console.log('dateEntry.value - ' + this.dateEntry);
     this.questionList = [];
-    this.loadQuestionsWithCriteria();
-    this.resetCheckboxes();
+    this.loadQuestionsWithCriteriaAsync();
+    this.unCheckAll();
   }
 
 }

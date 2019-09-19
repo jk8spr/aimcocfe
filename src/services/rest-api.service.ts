@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Question } from '../app/models/question';
+import { CocResult } from '../app/models/coCResult';
 import { Observable, throwError } from 'rxjs';
 import { retry, catchError } from 'rxjs/operators';
 
@@ -12,6 +13,7 @@ export class RestApiService {
   // Define API
   apiURL = 'https://cocapi.azurewebsites.net';
   asyncResult: Question[];
+  asyncCoCResult: CocResult;
   tCnt: number;
 
   constructor(private http: HttpClient) {
@@ -39,11 +41,16 @@ export class RestApiService {
     '/' + dEntry.toISOString() +
     '/' + dOS.toISOString() +
     '/' + mnFlag);
+    // this.asyncResult = await this.http.get<Question[]>(this.apiURL + '/api/coc' +
+    // '/' + dPS.toISOString() +
+    // '/' + dEntry.toISOString() +
+    // '/' + dOS.toISOString() +
+    // '/' + mnFlag).pipe(catchError(this.handleError)).toPromise();
     this.asyncResult = await this.http.get<Question[]>(this.apiURL + '/api/coc' +
-    '/' + dPS.toISOString() +
-    '/' + dEntry.toISOString() +
-    '/' + dOS.toISOString() +
-    '/' + mnFlag).pipe(catchError(this.handleError)).toPromise();
+    '?ProgramStartDate=' + dPS.toISOString() +
+    '&EntryDate=' + dEntry.toISOString() +
+    '&DateOfService=' + dOS.toISOString() +
+    '&MNFlag=' + mnFlag).pipe(catchError(this.handleError)).toPromise();
     console.log('No issues, I will wait until promise is resolved..');
     console.log('Get Results - ' + this.asyncResult.length);
     // console.log('tCnt - ' + this.tCnt);
@@ -92,6 +99,26 @@ export class RestApiService {
       retry(1),
       catchError(this.handleError)
     );
+  }
+
+  getCoCResult(Qs: string) {
+    console.log('Passing this as the Body');
+    console.log(JSON.stringify({AnswerList: Qs}));
+    return this.http.post<CocResult>(this.apiURL + '/api/coc/',
+    JSON.stringify({AnswerList: Qs}), this.httpOptions)
+    .pipe(
+      retry(1),
+      catchError(this.handleError)
+    )
+  }
+
+  async getCoCResultAsync(Qs: string) {
+    console.log('Passing this as the Body');
+    console.log(JSON.stringify({AnswerList: Qs}));
+    this.asyncCoCResult = await this.http.post<CocResult>(this.apiURL + '/api/coc/',
+    JSON.stringify({AnswerList: Qs}), this.httpOptions)
+    .pipe(catchError(this.handleError)).toPromise();
+    return this.asyncCoCResult;
   }
 
   handleError(error) {
