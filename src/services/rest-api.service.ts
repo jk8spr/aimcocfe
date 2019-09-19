@@ -37,15 +37,10 @@ export class RestApiService {
   async getQuestionsWithCriteriaAsync(dEntry: Date, dOS: Date, dPS: Date, mnFlag: boolean) {
     console.log('starting getQuestionsWithCriteriaAsync');
     console.log('url passed - ' + this.apiURL + '/api/coc' +
-    '/' + dPS.toISOString() +
-    '/' + dEntry.toISOString() +
-    '/' + dOS.toISOString() +
-    '/' + mnFlag);
-    // this.asyncResult = await this.http.get<Question[]>(this.apiURL + '/api/coc' +
-    // '/' + dPS.toISOString() +
-    // '/' + dEntry.toISOString() +
-    // '/' + dOS.toISOString() +
-    // '/' + mnFlag).pipe(catchError(this.handleError)).toPromise();
+    '?ProgramStartDate=' + dPS.toISOString() +
+    '&EntryDate=' + dEntry.toISOString() +
+    '&DateOfService=' + dOS.toISOString() +
+    '&MNFlag=' + mnFlag);
     this.asyncResult = await this.http.get<Question[]>(this.apiURL + '/api/coc' +
     '?ProgramStartDate=' + dPS.toISOString() +
     '&EntryDate=' + dEntry.toISOString() +
@@ -53,10 +48,6 @@ export class RestApiService {
     '&MNFlag=' + mnFlag).pipe(catchError(this.handleError)).toPromise();
     console.log('No issues, I will wait until promise is resolved..');
     console.log('Get Results - ' + this.asyncResult.length);
-    // console.log('tCnt - ' + this.tCnt);
-    // this.asyncResult.splice(this.tCnt, 1);
-    // this.tCnt++;
-    // console.log('Splice Results - ' + this.asyncResult.length);
     return this.asyncResult;
   }
 

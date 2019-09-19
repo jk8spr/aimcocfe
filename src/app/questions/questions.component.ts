@@ -110,8 +110,11 @@ export class QuestionsComponent implements OnInit {
             .map(value => false));
   }
 
-  private resetCheckboxes() {
+  private resetCriteria() {
     console.log('in reset');
+    this.unCheckAll();
+    this.cocResult = null;
+    this.badgeflag = false;
   }
 
   submit() {
@@ -138,15 +141,31 @@ export class QuestionsComponent implements OnInit {
                        this.EvalResults.coCDetermination;
       this.badgeflag = this.EvalResults.badgeFlag;
       console.log('done with submit');
-      this.unCheckAll();
+      // this.unCheckAll();
     });
   }
 
   CheckAndReload(): void {
-    console.log('dateEntry.value - ' + this.dateEntry);
-    this.questionList = [];
-    this.loadQuestionsWithCriteriaAsync();
-    this.unCheckAll();
+    this.dateEntry = this.form.value.dateEntry;
+    this.dateOS = this.form.value.dateOS;
+    this.datePrgStart = this.form.value.datePrgStart;
+    console.log('dateEntry - ' + this.dateEntry.toDateString());
+    console.log('dateOS - ' + this.dateOS.toDateString());
+    console.log('datePrgStart - ' + this.datePrgStart.toDateString());
+    const datePrgStartPlus180 = addDays(this.datePrgStart, 180);
+    console.log('datePrgStartPlus180 - ' + datePrgStartPlus180.toDateString());
+    console.log('HARD STOP LOGIC');
+    console.log(this.dateEntry > datePrgStartPlus180 && this.dateOS < this.datePrgStart);
+    console.log(this.dateEntry.toDateString() + ' > ' + datePrgStartPlus180.toDateString() +
+            ' && ' + this.dateOS.toDateString() + ' < ' + this.datePrgStart.toDateString());
+    if (this.dateEntry > datePrgStartPlus180 &&
+        this.dateOS < this.datePrgStart) {
+        this.cocResult = 'HARD STOP';
+    } else {
+        this.questionList = [];
+        this.loadQuestionsWithCriteriaAsync();
+        this.resetCriteria();
+    }
   }
 
 }
@@ -161,4 +180,8 @@ function minSelectedCheckboxes(min = 1) {
   };
 
   return validator;
+}
+
+function addDays(theDate, days) {
+  return new Date(theDate.getTime() + days * 24 * 60 * 60 * 1000);
 }
