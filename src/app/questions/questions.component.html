@@ -1,11 +1,14 @@
 
 <!-- Attestation questions -->
 <div class="splitRight">
-  <div class="leftjust">
-     <h4>Attestation</h4>
+  <div class="leftjust" *ngIf="!readyflag"c>
+    <p><b>Please Complete the Scenario Criteria...</b></p>
+  </div>
+  <div class="leftjust" *ngIf="readyflag">
+    <h4>Attestation</h4>
     <form [formGroup]="form" (ngSubmit)="submit()">
       <div *ngIf="!questionList">
-        <p><b>One moment while I'm loading your questions...</b></p>
+        <button [disabled]="!readyflag" class="btn btn-outline-primary btn-sm" (click)="CheckAndReload()" >Resfresh questions list</button>
       </div>
       <div class="table-responsive">
         <table class="table mb-0"
@@ -25,7 +28,9 @@
             </tr>
           </tbody>
         </table>
-        <button class="btn btn-outline-primary btn-sm">Finish</button>
+        <div *ngIf="questionList">
+            <button [disabled]="!questionList || questionList.length < 1" class="btn btn-outline-primary btn-sm">Finish</button>
+        </div>
       </div>
     </form>
   </div>
@@ -37,26 +42,26 @@
       <div class="centered" [formGroup]="form" >
         <h4>Scenario Criteria</h4>
         <mat-form-field>
-          <input matInput [matDatepicker] = "picker1" placeholder = "Entry Date" formControlName="dateEntry">
+          <input matInput [matDatepicker]="picker1" placeholder="Entry Date" formControlName="dateEntry" (ngModelChange)="onDate($event)">
           <mat-datepicker-toggle matSuffix [for] = "picker1"></mat-datepicker-toggle>
-          <mat-datepicker #picker1></mat-datepicker>
+          <mat-datepicker #picker1 ></mat-datepicker>
         </mat-form-field>
         <br>
         <mat-form-field>
-          <input matInput [matDatepicker] = "picker2" placeholder = "Date of Service" formControlName="dateOS">
+          <input matInput [matDatepicker]="picker2" placeholder="Date of Service" formControlName="dateOS" (ngModelChange)="onDate($event)">
           <mat-datepicker-toggle matSuffix [for] = "picker2"></mat-datepicker-toggle>
-          <mat-datepicker #picker2></mat-datepicker>
+          <mat-datepicker #picker2 ></mat-datepicker>
         </mat-form-field>
         <br>
         <mat-form-field>
-          <input matInput [matDatepicker] = "picker3" placeholder = "Program Start Date" formControlName="datePrgStart">
+          <input matInput [matDatepicker] = "picker3" placeholder = "Program Start Date" formControlName="datePrgStart" (ngModelChange)="onDate($event)">
           <mat-datepicker-toggle matSuffix [for] = "picker3"></mat-datepicker-toggle>
-          <mat-datepicker #picker3></mat-datepicker>
+          <mat-datepicker #picker3 ></mat-datepicker>
         </mat-form-field>
         <br>
-        <!-- <mat-checkbox class = "tp-margin" #mnFlag [formControl]="bool">MN Flag</mat-checkbox> -->
+        <mat-checkbox class = "tp-margin" formControlName="vanillaFlag">Vanilla</mat-checkbox>
         <br>
-        <button class="btn btn-outline-primary btn-sm" (click)="CheckAndReload()">Get Qs and Reload / Reset</button>
+        <button [disabled]="!readyflag" class="btn btn-outline-primary btn-sm" (click)="CheckAndReload()" >Get Qs and Reload / Reset</button>
     </div>
     <br>
   </div>

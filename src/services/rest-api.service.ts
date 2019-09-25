@@ -34,20 +34,24 @@ export class RestApiService {
     return this.asyncResult;
   }
 
-  async getQuestionsWithCriteriaAsync(dEntry: Date, dOS: Date, dPS: Date, mnFlag: boolean) {
+  async getQuestionsWithCriteriaAsync(dEntry: Date, dOS: Date, dPS: Date, vFlag: boolean) {
     console.log('starting getQuestionsWithCriteriaAsync');
-    console.log('url passed - ' + this.apiURL + '/api/coc' +
-    '?ProgramStartDate=' + dPS.toISOString() +
-    '&EntryDate=' + dEntry.toISOString() +
-    '&DateOfService=' + dOS.toISOString() +
-    '&MNFlag=' + mnFlag);
-    this.asyncResult = await this.http.get<Question[]>(this.apiURL + '/api/coc' +
-    '?ProgramStartDate=' + dPS.toISOString() +
-    '&EntryDate=' + dEntry.toISOString() +
-    '&DateOfService=' + dOS.toISOString() +
-    '&MNFlag=' + mnFlag).pipe(catchError(this.handleError)).toPromise();
-    console.log('No issues, I will wait until promise is resolved..');
-    console.log('Get Results - ' + this.asyncResult.length);
+    console.log('vanillaFlag passed into API service');
+    console.log(vFlag);
+    if (dOS && dEntry && dPS) {
+      console.log('url passed - ' + this.apiURL + '/api/coc' +
+      '?ProgramStartDate=' + dPS.toISOString() +
+      '&EntryDate=' + dEntry.toISOString() +
+      '&DateOfService=' + dOS.toISOString() +
+      '&Client=' + (vFlag ? 'Vanilla' : 'MA'));
+      this.asyncResult = await this.http.get<Question[]>(this.apiURL + '/api/coc' +
+      '?ProgramStartDate=' + dPS.toISOString() +
+      '&EntryDate=' + dEntry.toISOString() +
+      '&DateOfService=' + dOS.toISOString() +
+      '&Client=' + (vFlag ? 'Vanilla' : 'MA')).pipe(catchError(this.handleError)).toPromise();
+      console.log('No issues, I will wait until promise is resolved..');
+      console.log('Get Results - ' + this.asyncResult.length);
+    }
     return this.asyncResult;
   }
 

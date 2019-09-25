@@ -18,7 +18,7 @@ export class QuestionsComponent implements OnInit {
   dateEntry = new Date();
   dateOS = new Date();
   datePrgStart = new Date();
-  mnFlag = false;
+  vanillaFlag = false;
   bool = new FormControl(false);
   cocResult: string;
   checked = false;
@@ -27,24 +27,28 @@ export class QuestionsComponent implements OnInit {
   disabled = false;
   badgeflag: boolean;
   levelClinical: string;
+  readyflag: boolean;
 
   constructor(
     private formBuilder: FormBuilder,
     public restApi: RestApiService) {
     this.form = this.formBuilder.group({
       questions: new FormArray([], minSelectedCheckboxes(0)),
-      dateOS: new FormControl(new Date('7/11/2021')),
-      dateEntry: new FormControl(new Date('7/10/2021')),
+      dateOS: new FormControl(null), // new FormControl(new Date('7/11/2021')),
+      dateEntry: new FormControl(null), // new FormControl(new Date('7/10/2021')),
       datePrgStart: new FormControl(new Date('1/1/2021')),
+      vanillaFlag: false,
       badgeflag: false
     });
-    this.badgeflag = false;
-    this.EvalResults = { coCDetermination: '', levelOne: '', levelTwo: '', levelThree: '', badgeFlag: null, extra: ''};
-    this.levelClinical = 'Not Met';
   }
 
   ngOnInit() {
-    // this.loadQuestions();
+    this.badgeflag = false;
+    this.readyflag = false;
+    this.EvalResults = { coCDetermination: '', levelOne: '', levelTwo: '', levelThree: '', badgeFlag: null, extra: ''};
+    this.levelClinical = 'Not Met';
+    this.dateEntry = null;
+    this.dateOS = null;
     this.loadQuestionsWithCriteriaAsync();
   }
 
@@ -68,28 +72,33 @@ export class QuestionsComponent implements OnInit {
   }
 
   loadQuestionsWithCriteriaAsync() {
-    this.dateEntry = this.form.value.dateEntry;
-    this.dateOS = this.form.value.dateOS;
-    this.datePrgStart = this.form.value.datePrgStart;
-    this.restApi.getQuestionsWithCriteriaAsync(this.dateEntry,
+    console.log('in loadQuestionsWithCriteriaAsync');
+    if (this.readyflag) {
+      this.dateEntry = this.form.value.dateEntry;
+      this.dateOS = this.form.value.dateOS;
+      this.datePrgStart = this.form.value.datePrgStart;
+      this.vanillaFlag = this.form.value.vanillaFlag;
+      this.restApi.getQuestionsWithCriteriaAsync(this.dateEntry,
       this.dateOS,
       this.datePrgStart,
-      this.mnFlag).then(questions => {
+      this.vanillaFlag).then(questions => {
         this.questionList = questions;
         this.addCheckboxes();
         // console.log(JSON.stringify(questions));
         console.log('loadQuestionsWithCriteriaAsync Results - ' + questions.length);
       });
+    }
   }
 
   loadQuestionsWithCriteria() {
     this.dateEntry = this.form.value.dateEntry;
     this.dateOS = this.form.value.dateOS;
     this.datePrgStart = this.form.value.datePrgStart;
+    this.vanillaFlag = this.form.value.vanillaFlag;
     this.restApi.getQuestionsWithCriteria(this.dateEntry,
       this.dateOS,
       this.datePrgStart,
-      this.mnFlag).subscribe(questions => {
+      this.vanillaFlag).subscribe(questions => {
         this.questionList = questions;
         this.addCheckboxes();
         // console.log(JSON.stringify(questions));
@@ -98,10 +107,12 @@ export class QuestionsComponent implements OnInit {
   }
 
   private addCheckboxes() {
-    this.questionList.forEach((o, i) => {
-      const control = new FormControl(i < 0);
-      (this.form.controls.questions as FormArray).push(control);
-    });
+    if (this.questionList) {
+      this.questionList.forEach((o, i) => {
+        const control = new FormControl(i < 0);
+        (this.form.controls.questions as FormArray).push(control);
+      });
+    }
   }
 
   private unCheckAll() {
@@ -115,6 +126,7 @@ export class QuestionsComponent implements OnInit {
     this.unCheckAll();
     this.cocResult = null;
     this.badgeflag = false;
+    this.vanillaFlag = false;
   }
 
   submit() {
@@ -135,7 +147,6 @@ export class QuestionsComponent implements OnInit {
       console.log(x.levelThree);
       console.log(x.coCDetermination);
       console.log(x.badgeFlag);
-
       this.cocResult = this.EvalResults.levelOne + ' / ' +
                        this.levelClinical + ' / ' +
                        this.EvalResults.coCDetermination;
@@ -149,10 +160,11 @@ export class QuestionsComponent implements OnInit {
     this.dateEntry = this.form.value.dateEntry;
     this.dateOS = this.form.value.dateOS;
     this.datePrgStart = this.form.value.datePrgStart;
+    this.vanillaFlag = this.form.value.vanillaFlag;
+    const datePrgStartPlus180 = addDays(this.datePrgStart, 180);
     console.log('dateEntry - ' + this.dateEntry.toDateString());
     console.log('dateOS - ' + this.dateOS.toDateString());
     console.log('datePrgStart - ' + this.datePrgStart.toDateString());
-    const datePrgStartPlus180 = addDays(this.datePrgStart, 180);
     console.log('datePrgStartPlus180 - ' + datePrgStartPlus180.toDateString());
     console.log('HARD STOP LOGIC');
     console.log(this.dateEntry > datePrgStartPlus180 && this.dateOS < this.datePrgStart);
@@ -165,6 +177,22 @@ export class QuestionsComponent implements OnInit {
         this.questionList = [];
         this.loadQuestionsWithCriteriaAsync();
         this.resetCriteria();
+    }
+  }
+
+  public onDate(newDate): void {
+    console.log('in onDate - ' + newDate);
+    this.readyflag = false;
+    this.dateEntry = this.form.value.dateEntry;
+    this.dateOS = this.form.value.dateOS;
+    this.datePrgStart = this.form.value.datePrgStart;
+    if (this.dateEntry &&
+        this.dateOS &&
+        this.datePrgStart) {
+        this.readyflag = true;
+    } else {
+      this.resetCriteria();
+      this.questionList = null;
     }
   }
 

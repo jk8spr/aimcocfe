@@ -52,13 +52,13 @@ p {
 
 .splitRight {
   float: right;
-  width: 65%;
+  width: 75%;
   padding: 10px;
   font-size: 13px;
 }
 .splitLeft {
   overflow: auto;
-  width: 35%;
+  width: 25%;
   padding: 10px;
   background-color: whitesmoke;
   font-size: 13px;
