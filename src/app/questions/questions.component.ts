@@ -3,7 +3,9 @@ import { FormBuilder, FormGroup, FormArray, FormControl, ValidatorFn  } from '@a
 import { RestApiService } from '../../services/rest-api.service';
 import { Question } from '../models/question';
 import { CocResult } from '../models/coCResult';
-import { of } from 'rxjs';
+import { ILevelOne } from '../models/levelZero';
+import { Observable } from 'rxjs';
+import { MatSelectionListChange } from '@angular/material';
 
 @Component({
   selector: 'app-questions',
@@ -28,17 +30,26 @@ export class QuestionsComponent implements OnInit {
   badgeflag: boolean;
   levelClinical: string;
   readyflag: boolean;
+  levelZeroList: ILevelOne[] = [
+    {id: 0, quexText: 'New Treatment',
+     extra: 'Patient is receiving this treatment for the first time.  This includes additions to, removals, or changes in administration of the drugs from a previous treatment Plan.'},
+    {id: 1, quexText: 'Treatment Extension', extra: 'This treatment has been previously reviewed by AIM'},
+    {id: 2, quexText: 'Continuation of Treatment', extra: 'These services have been approved by the health Plan or previously did not required authorization'}
+  ];
+  selectedValue: string;
+  treatmentType: ILevelOne;
 
   constructor(
     private formBuilder: FormBuilder,
     public restApi: RestApiService) {
     this.form = this.formBuilder.group({
       questions: new FormArray([], minSelectedCheckboxes(0)),
-      dateOS: new FormControl(null), // new FormControl(new Date('7/11/2021')),
-      dateEntry: new FormControl(null), // new FormControl(new Date('7/10/2021')),
+      dateEntry: new FormControl(new Date('7/10/2021')), // new FormControl(null),
+      dateOS: new FormControl(new Date('7/11/2021')), // new FormControl(null),
       datePrgStart: new FormControl(new Date('1/1/2021')),
       vanillaFlag: false,
-      badgeflag: false
+      badgeflag: false,
+      treatmentType: new FormControl(null)
     });
   }
 
@@ -47,9 +58,17 @@ export class QuestionsComponent implements OnInit {
     this.readyflag = false;
     this.EvalResults = { coCDetermination: '', levelOne: '', levelTwo: '', levelThree: '', badgeFlag: null, extra: ''};
     this.levelClinical = 'Not Met';
-    this.dateEntry = null;
-    this.dateOS = null;
+    this.dateEntry = this.form.value.dateEntry;
+    this.dateOS = this.form.value.dateOS;
+    this.datePrgStart = this.form.value.datePrgStart;
+
+    if (this.dateEntry &&
+      this.dateOS &&
+      this.datePrgStart) {
+      this.readyflag = true;
+    }
     this.loadQuestionsWithCriteriaAsync();
+    // this.levelZeroList =
   }
 
   // loadQuestions() {
@@ -61,6 +80,11 @@ export class QuestionsComponent implements OnInit {
   //     error => { this.questionList = []; }
   //   );
   // }
+
+
+  loadLevelOneList() {
+    this.restApi.getLevelOne();
+  }
 
   loadQuestionsAsync() {
     this.restApi.getQuestionsAsync().then(questions => {
@@ -130,6 +154,8 @@ export class QuestionsComponent implements OnInit {
   }
 
   submit() {
+    console.log('In submit - treatmentType');
+    console.log(this.form.value.treatmentType);
     const selectedQuestionIds = this.form.value.questions
       .map((v, i) => v ? this.questionList[i] : null )
       .filter(v => v !== null);
@@ -194,6 +220,20 @@ export class QuestionsComponent implements OnInit {
       this.resetCriteria();
       this.questionList = null;
     }
+  }
+
+  onTreatmentTypeChange(event: MatSelectionListChange) {
+    console.log('in onTreatmentTypeChange');
+    console.log('selectedOptions:', event.source._value);
+    this.treatmentType = this.form.value.treatmentType;
+    this.selectedValue = this.treatmentType.extra;
+    console.log('selectedValue' + this.selectedValue);
+    this.resetCriteria();
+  }
+
+  showFinishButton()  {
+    // (!questionList || questionList.length < 1) || (treatmentType && treatmentType.id == 0)
+    return true;
   }
 
 }

@@ -3,7 +3,8 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Question } from '../app/models/question';
 import { CocResult } from '../app/models/coCResult';
 import { Observable, throwError } from 'rxjs';
-import { retry, catchError } from 'rxjs/operators';
+import { retry, catchError, tap } from 'rxjs/operators';
+import { ILevelOne } from '../app/models/levelZero';
 
 @Injectable({
   providedIn: 'root'
@@ -12,6 +13,7 @@ export class RestApiService {
 
   // Define API
   apiURL = 'https://cocapi.azurewebsites.net';
+  leveloneUrl = 'server/levelOne.json';
   asyncResult: Question[];
   asyncCoCResult: CocResult;
   tCnt: number;
@@ -26,6 +28,10 @@ export class RestApiService {
       'Content-Type': 'application/json'
     })
   };
+
+  getLevelOne(): Observable<ILevelOne[]> {
+    return this.http.get<ILevelOne[]>(this.leveloneUrl);
+  }
 
   async getQuestionsAsync() {
     this.asyncResult = await this.http.get<Question[]>(this.apiURL + '/api/coc/').toPromise();

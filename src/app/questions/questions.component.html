@@ -10,7 +10,22 @@
       <div *ngIf="!questionList">
         <button [disabled]="!readyflag" class="btn btn-outline-primary btn-sm" (click)="CheckAndReload()" >Resfresh questions list</button>
       </div>
-      <div class="table-responsive">
+      <div *ngIf="questionList">
+        <p><b>Treatment Type</b></p>
+        <mat-select style="width:180px;" placeholder = "Select Treatment Type"
+          (selectionChange)="onTreatmentTypeChange($event)"
+          formControlName="treatmentType"
+          matTooltip='Click to start Attestation'>
+            <mat-option *ngFor="let qex of levelZeroList"
+               [value]="qex" matTooltip='{{qex.extra}}'>
+               <b>{{qex.quexText}}</b>
+            </mat-option>
+          </mat-select>
+          <br>
+          <p style="width:400px;">{{selectedValue}}</p>
+          <br><br>
+      </div>
+      <div *ngIf="treatmentType && treatmentType.id > 0" class="table-responsive">
         <table class="table mb-0"
                formArrayName="questions"
                *ngIf="questionList && questionList.length">
@@ -28,11 +43,11 @@
             </tr>
           </tbody>
         </table>
-        <div *ngIf="questionList">
-            <button [disabled]="!questionList || questionList.length < 1" class="btn btn-outline-primary btn-sm">Finish</button>
-        </div>
       </div>
-    </form>
+      <div *ngIf="treatmentType">
+          <button [disabled]="(!questionList || questionList.length < 1) || !treatmentType" class="btn btn-outline-primary btn-sm">Finish</button>
+      </div>
+  </form>
   </div>
 </div>
 
