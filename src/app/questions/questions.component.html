@@ -54,7 +54,7 @@
         </table>
       </div>
       <div *ngIf="treatmentType">
-          <button [disabled]="(!questionList || questionList.length < 1) || !treatmentType" class="btn btn-outline-primary btn-sm">Finish</button>
+          <button [disabled]="!questionList || !treatmentType" class="btn btn-outline-primary btn-sm">Finish</button>
       </div>
   </form>
   </div>
