@@ -12,7 +12,7 @@
       </div>
       <div *ngIf="questionList">
         <p><b>Treatment Type</b></p>
-        <mat-select style="width:180px;" placeholder = "Select Treatment Type"
+        <mat-select style="width:200px;" placeholder = "Select Treatment Type"
           (selectionChange)="onTreatmentTypeChange($event)"
           formControlName="treatmentType"
           matTooltip='Click to start Attestation'>
@@ -30,15 +30,24 @@
                formArrayName="questions"
                *ngIf="questionList && questionList.length">
           <tbody>
+            <th>Answer</th>
+            <th>Id</th>
+            <th>Level</th>
+            <th>Question</th>
             <tr *ngFor="let question of questionList; let i = index">
               <td>
                   <mat-checkbox class = "tp-margin" [formControlName]="i">Yes</mat-checkbox>
               </td>
               <td>
-                 {{question.quexId}}
+                {{question.quexId}}
               </td>
               <td>
-                  {{question.quexText}}
+                  {{question.level}}
+              </td>
+              <td>
+                <div style="white-space: pre-line;">
+                    {{question.quexText}}
+                </div>
               </td>
             </tr>
           </tbody>
@@ -74,7 +83,7 @@
           <mat-datepicker #picker3 ></mat-datepicker>
         </mat-form-field>
         <br>
-        <mat-checkbox class = "tp-margin" formControlName="vanillaFlag">Vanilla</mat-checkbox>
+        <mat-checkbox class = "tp-margin" formControlName="vanillaFlag">BCBSMA</mat-checkbox>
         <br>
         <button [disabled]="!readyflag" class="btn btn-outline-primary btn-sm" (click)="CheckAndReload()" >Get Qs and Reload / Reset</button>
     </div>

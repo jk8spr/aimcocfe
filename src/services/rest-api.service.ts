@@ -40,21 +40,23 @@ export class RestApiService {
     return this.asyncResult;
   }
 
-  async getQuestionsWithCriteriaAsync(dEntry: Date, dOS: Date, dPS: Date, vFlag: boolean) {
+  async getQuestionsWithCriteriaAsync(dEntry: Date, dOS: Date, dPS: Date, vFlag: boolean, TT: number) {
     console.log('starting getQuestionsWithCriteriaAsync');
     console.log('vanillaFlag passed into API service');
     console.log(vFlag);
-    if (dOS && dEntry && dPS) {
+    if (dOS && dEntry && dPS && TT) {
       console.log('url passed - ' + this.apiURL + '/api/coc' +
       '?ProgramStartDate=' + dPS.toISOString() +
       '&EntryDate=' + dEntry.toISOString() +
       '&DateOfService=' + dOS.toISOString() +
-      '&Client=' + (vFlag ? 'Vanilla' : 'MA'));
+      '&Client=' + (!vFlag ? 'Vanilla' : 'BCBSMA') +
+      '&TreatmentType=' + TT.toString());
       this.asyncResult = await this.http.get<Question[]>(this.apiURL + '/api/coc' +
       '?ProgramStartDate=' + dPS.toISOString() +
       '&EntryDate=' + dEntry.toISOString() +
       '&DateOfService=' + dOS.toISOString() +
-      '&Client=' + (vFlag ? 'Vanilla' : 'MA')).pipe(catchError(this.handleError)).toPromise();
+      '&Client=' + (!vFlag ? 'Vanilla' : 'BCBSMA') +
+      '&TreatmentType=' + TT.toString()).pipe(catchError(this.handleError)).toPromise();
       console.log('No issues, I will wait until promise is resolved..');
       console.log('Get Results - ' + this.asyncResult.length);
     }
@@ -113,11 +115,11 @@ export class RestApiService {
     )
   }
 
-  async getCoCResultAsync(Qs: string) {
+  async getCoCResultAsync(Qs: string, TT: number) {
     console.log('Passing this as the Body');
-    console.log(JSON.stringify({AnswerList: Qs}));
+    console.log(JSON.stringify({TreatmentType: TT, AnswerList: Qs}));
     this.asyncCoCResult = await this.http.post<CocResult>(this.apiURL + '/api/coc/',
-    JSON.stringify({AnswerList: Qs}), this.httpOptions)
+    JSON.stringify({TreatmentType: TT, AnswerList: Qs}), this.httpOptions)
     .pipe(catchError(this.handleError)).toPromise();
     return this.asyncCoCResult;
   }

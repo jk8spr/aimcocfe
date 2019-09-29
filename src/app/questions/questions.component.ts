@@ -20,7 +20,7 @@ export class QuestionsComponent implements OnInit {
   dateEntry = new Date();
   dateOS = new Date();
   datePrgStart = new Date();
-  vanillaFlag = false;
+  vanillaFlag = true;
   bool = new FormControl(false);
   cocResult: string;
   checked = false;
@@ -47,7 +47,7 @@ export class QuestionsComponent implements OnInit {
       dateEntry: new FormControl(new Date('7/10/2021')), // new FormControl(null),
       dateOS: new FormControl(new Date('7/11/2021')), // new FormControl(null),
       datePrgStart: new FormControl(new Date('1/1/2021')),
-      vanillaFlag: false,
+      vanillaFlag: true,
       badgeflag: false,
       treatmentType: new FormControl(null)
     });
@@ -102,15 +102,19 @@ export class QuestionsComponent implements OnInit {
       this.dateOS = this.form.value.dateOS;
       this.datePrgStart = this.form.value.datePrgStart;
       this.vanillaFlag = this.form.value.vanillaFlag;
-      this.restApi.getQuestionsWithCriteriaAsync(this.dateEntry,
-      this.dateOS,
-      this.datePrgStart,
-      this.vanillaFlag).then(questions => {
-        this.questionList = questions;
-        this.addCheckboxes();
-        // console.log(JSON.stringify(questions));
-        console.log('loadQuestionsWithCriteriaAsync Results - ' + questions.length);
-      });
+      this.treatmentType = this.form.value.treatmentType;
+      if (this.treatmentType) {
+        this.restApi.getQuestionsWithCriteriaAsync(this.dateEntry,
+        this.dateOS,
+        this.datePrgStart,
+        this.vanillaFlag,
+        this.treatmentType.id).then(questions => {
+          this.questionList = questions;
+          this.addCheckboxes();
+          // console.log(JSON.stringify(questions));
+          console.log('loadQuestionsWithCriteriaAsync Results - ' + questions.length);
+        });
+      }
     }
   }
 
@@ -150,7 +154,7 @@ export class QuestionsComponent implements OnInit {
     this.unCheckAll();
     this.cocResult = null;
     this.badgeflag = false;
-    this.vanillaFlag = false;
+    this.vanillaFlag = true;
   }
 
   submit() {
@@ -160,7 +164,7 @@ export class QuestionsComponent implements OnInit {
       .map((v, i) => v ? this.questionList[i] : null )
       .filter(v => v !== null);
     console.log(selectedQuestionIds);
-    this.restApi.getCoCResultAsync(selectedQuestionIds).then(x => {
+    this.restApi.getCoCResultAsync(selectedQuestionIds, this.treatmentType.id).then(x => {
       this.EvalResults = x;
       this.EvalResults.levelOne = x.levelOne;
       if (x.levelTwo === 'Met' && x.levelThree === 'Met') {
@@ -173,9 +177,7 @@ export class QuestionsComponent implements OnInit {
       console.log(x.levelThree);
       console.log(x.coCDetermination);
       console.log(x.badgeFlag);
-      this.cocResult = this.EvalResults.levelOne + ' / ' +
-                       this.levelClinical + ' / ' +
-                       this.EvalResults.coCDetermination;
+      this.cocResult = this.EvalResults.coCDetermination;
       this.badgeflag = this.EvalResults.badgeFlag;
       console.log('done with submit');
       // this.unCheckAll();
@@ -228,6 +230,7 @@ export class QuestionsComponent implements OnInit {
     this.treatmentType = this.form.value.treatmentType;
     this.selectedValue = this.treatmentType.extra;
     console.log('selectedValue' + this.selectedValue);
+    this.loadQuestionsWithCriteriaAsync();
     this.resetCriteria();
   }
 
