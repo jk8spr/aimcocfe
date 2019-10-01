@@ -4,7 +4,6 @@ import { RestApiService } from '../../services/rest-api.service';
 import { Question } from '../models/question';
 import { CocResult } from '../models/coCResult';
 import { ILevelOne } from '../models/levelZero';
-import { Observable } from 'rxjs';
 import { MatSelectionListChange } from '@angular/material';
 
 @Component({
@@ -31,10 +30,10 @@ export class QuestionsComponent implements OnInit {
   levelClinical: string;
   readyflag: boolean;
   levelZeroList: ILevelOne[] = [
-    {id: 0, quexText: 'New Treatment',
+    {id: 0, quexText: 'New Treatment \n',
      extra: 'Patient is receiving this treatment for the first time.  This includes additions to, removals, or changes in administration of the drugs from a previous treatment Plan.'},
-    {id: 1, quexText: 'Treatment Extension', extra: 'This treatment has been previously reviewed by AIM'},
-    {id: 2, quexText: 'Continuation of Treatment', extra: 'These services have been approved by the health Plan or previously did not required authorization'}
+    {id: 1, quexText: 'Treatment Extension \n', extra: 'This treatment has been previously reviewed by AIM'},
+    {id: 2, quexText: 'Continuation of Treatment \n', extra: 'These services have been approved by the health Plan or previously did not required authorization'}
   ];
   selectedValue: string;
   treatmentType: ILevelOne;
@@ -49,7 +48,7 @@ export class QuestionsComponent implements OnInit {
       datePrgStart: new FormControl(new Date('1/1/2021')),
       vanillaFlag: true,
       badgeflag: false,
-      treatmentType: new FormControl(null)
+      treatmentType: new FormControl(null),
     });
   }
 
@@ -68,7 +67,6 @@ export class QuestionsComponent implements OnInit {
       this.readyflag = true;
     }
     this.loadQuestionsWithCriteriaAsync();
-    // this.levelZeroList =
   }
 
   // loadQuestions() {
@@ -104,15 +102,18 @@ export class QuestionsComponent implements OnInit {
       this.vanillaFlag = this.form.value.vanillaFlag;
       this.treatmentType = this.form.value.treatmentType;
       if (this.treatmentType) {
-        this.restApi.getQuestionsWithCriteriaAsync(this.dateEntry,
+        this.restApi.getQuestionsWithCriteriaAsync(
+        this.dateEntry,
         this.dateOS,
         this.datePrgStart,
         this.vanillaFlag,
         this.treatmentType.id).then(questions => {
-          this.questionList = questions;
+          this.questionList = questions ? questions : [];
           this.addCheckboxes();
-          // console.log(JSON.stringify(questions));
-          console.log('loadQuestionsWithCriteriaAsync Results - ' + questions.length);
+          if (questions) {
+            console.log(JSON.stringify(questions));
+            console.log('loadQuestionsWithCriteriaAsync Results - ' + questions.length);
+          }
         });
       }
     }
@@ -230,6 +231,7 @@ export class QuestionsComponent implements OnInit {
     this.treatmentType = this.form.value.treatmentType;
     this.selectedValue = this.treatmentType.extra;
     console.log('selectedValue' + this.selectedValue);
+    this.readyflag = true;
     this.loadQuestionsWithCriteriaAsync();
     this.resetCriteria();
   }

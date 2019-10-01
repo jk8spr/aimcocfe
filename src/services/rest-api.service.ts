@@ -44,13 +44,14 @@ export class RestApiService {
     console.log('starting getQuestionsWithCriteriaAsync');
     console.log('vanillaFlag passed into API service');
     console.log(vFlag);
+    console.log('url passed - ' + this.apiURL + '/api/coc' +
+    '?ProgramStartDate=' + dPS.toISOString() +
+    '&EntryDate=' + dEntry.toISOString() +
+    '&DateOfService=' + dOS.toISOString() +
+    '&Client=' + (!vFlag ? 'Vanilla' : 'BCBSMA') +
+    '&TreatmentType=' + TT.toString());
+
     if (dOS && dEntry && dPS && TT) {
-      console.log('url passed - ' + this.apiURL + '/api/coc' +
-      '?ProgramStartDate=' + dPS.toISOString() +
-      '&EntryDate=' + dEntry.toISOString() +
-      '&DateOfService=' + dOS.toISOString() +
-      '&Client=' + (!vFlag ? 'Vanilla' : 'BCBSMA') +
-      '&TreatmentType=' + TT.toString());
       this.asyncResult = await this.http.get<Question[]>(this.apiURL + '/api/coc' +
       '?ProgramStartDate=' + dPS.toISOString() +
       '&EntryDate=' + dEntry.toISOString() +
