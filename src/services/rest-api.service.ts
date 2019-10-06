@@ -48,7 +48,7 @@ export class RestApiService {
     '?ProgramStartDate=' + dPS.toISOString() +
     '&EntryDate=' + dEntry.toISOString() +
     '&DateOfService=' + dOS.toISOString() +
-    '&Client=' + (!vFlag ? 'Vanilla' : 'BCBSMA') +
+    '&Client=' + (!vFlag ? 'GENERIC' : 'BCBSMA') +
     '&TreatmentType=' + TT.toString());
 
     if (dOS && dEntry && dPS && TT) {
@@ -56,7 +56,7 @@ export class RestApiService {
       '?ProgramStartDate=' + dPS.toISOString() +
       '&EntryDate=' + dEntry.toISOString() +
       '&DateOfService=' + dOS.toISOString() +
-      '&Client=' + (!vFlag ? 'Vanilla' : 'BCBSMA') +
+      '&Client=' + (!vFlag ? 'GENERIC' : 'BCBSMA') +
       '&TreatmentType=' + TT.toString()).pipe(catchError(this.handleError)).toPromise();
       console.log('No issues, I will wait until promise is resolved..');
       console.log('Get Results - ' + this.asyncResult.length);

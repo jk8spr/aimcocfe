@@ -90,7 +90,13 @@
           <mat-datepicker #picker3 ></mat-datepicker>
         </mat-form-field>
         <br>
-        <mat-checkbox class = "tp-margin" formControlName="vanillaFlag">BCBSMA</mat-checkbox>
+        <mat-checkbox class="tp-margin" formControlName="vanillaFlag" (click)="onCBClick(vanillaFlag)"></mat-checkbox>
+        <div *ngIf="vanillaFlag == true" >
+          <mat-label style="font-size: smaller"><b>BCBSMA</b></mat-label>
+        </div>
+        <div *ngIf="vanillaFlag == false" >
+          <mat-label style="font-size: smaller"><b>GENERIC</b><br>When not checked GENERIC will display in questions for testing</mat-label>
+        </div>
         <br>
         <button [disabled]="!readyflag" class="btn btn-outline-primary btn-sm" (click)="CheckAndReload()" >Get Qs and Reload / Reset</button>
     </div>

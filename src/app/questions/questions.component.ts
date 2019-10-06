@@ -5,6 +5,7 @@ import { Question } from '../models/question';
 import { CocResult } from '../models/coCResult';
 import { ILevelOne } from '../models/levelZero';
 import { MatSelectionListChange } from '@angular/material';
+import { MatCheckbox } from '@angular/material';
 
 @Component({
   selector: 'app-questions',
@@ -155,7 +156,7 @@ export class QuestionsComponent implements OnInit {
     this.unCheckAll();
     this.cocResult = null;
     this.badgeflag = false;
-    this.vanillaFlag = true;
+    //this.vanillaFlag = true;
   }
 
   submit() {
@@ -239,6 +240,13 @@ export class QuestionsComponent implements OnInit {
   showFinishButton()  {
     // (!questionList || questionList.length < 1) || (treatmentType && treatmentType.id == 0)
     return true;
+  }
+
+  onCBClick(checkbox: MatCheckbox) {
+      console.log('In ');
+      console.log(checkbox);
+      // console.log(checkbox.checked);
+      this.vanillaFlag = !checkbox;
   }
 
 }
