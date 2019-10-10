@@ -25,7 +25,7 @@
       <!-- <div *ngIf="newTreatment != null && !newTreatment"> -->
         <div *ngIf="questionList">
           <p><b>Treatment Type</b></p>
-          <mat-select style="width:30%; margin: 1rem 0; white-space: pre-line;" placeholder = "Select Treatment Type"
+          <mat-select style="width:40%; margin: 1rem 0; white-space: pre-line;" placeholder = "Select Treatment Type"
             (selectionChange)="onTreatmentTypeChange($event)"
             formControlName="treatmentType"
             matTooltip='Click to select Treatment type' required #select>
