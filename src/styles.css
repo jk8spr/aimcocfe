@@ -77,3 +77,13 @@ p {
   padding: 0px;
   width: 28px;
 }
+.tp-radio-group {
+  display: inline-flex;
+  flex-direction: row;
+}
+.tp-radio-button {
+  margin: 5px;
+}
+.tp-selected-value {
+  margin: 15px 0;
+}

@@ -51,7 +51,7 @@ export class RestApiService {
     '&Client=' + (!vFlag ? 'GENERIC' : 'BCBSMA') +
     '&TreatmentType=' + TT.toString());
 
-    if (dOS && dEntry && dPS && TT) {
+    if (dOS && dEntry && dPS) {
       this.asyncResult = await this.http.get<Question[]>(this.apiURL + '/api/coc' +
       '?ProgramStartDate=' + dPS.toISOString() +
       '&EntryDate=' + dEntry.toISOString() +
@@ -60,7 +60,7 @@ export class RestApiService {
       '&TreatmentType=' + TT.toString()).pipe(catchError(this.handleError)).toPromise();
       console.log('No issues, I will wait until promise is resolved..');
       console.log('Get Results - ' + this.asyncResult.length);
-    }
+    } else { console.log('not enough parms for getQuestionsWithCriteriaAsync');}
     return this.asyncResult;
   }
 

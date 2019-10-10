@@ -4,7 +4,8 @@ import { RestApiService } from '../../services/rest-api.service';
 import { Question } from '../models/question';
 import { CocResult } from '../models/coCResult';
 import { ILevelOne } from '../models/levelZero';
-import { MatSelectionListChange } from '@angular/material';
+import { ITreatment } from '../models/treatment';
+import { MatSelectionListChange, MatRadioChange  } from '@angular/material';
 import { MatCheckbox } from '@angular/material';
 
 @Component({
@@ -30,14 +31,24 @@ export class QuestionsComponent implements OnInit {
   badgeflag: boolean;
   levelClinical: string;
   readyflag: boolean;
+  finishflag: boolean;
+  tt: number;
   levelZeroList: ILevelOne[] = [
-    {id: 0, quexText: 'New Treatment \n',
-     extra: 'Patient is receiving this treatment for the first time.  This includes additions to, removals, or changes in administration of the drugs from a previous treatment Plan.'},
+    // {id: 0, quexText: 'New Treatment \n',
+    //  extra: 'Patient is receiving this treatment for the first time.  This includes additions to, removals, or changes in administration of the drugs from a previous treatment Plan.'},
     {id: 1, quexText: 'Treatment Extension \n', extra: 'This treatment has been previously reviewed by AIM'},
-    {id: 2, quexText: 'Continuation of Treatment \n', extra: 'These services have been approved by the health Plan or previously did not required authorization'}
+    {id: 2, quexText: 'Continuation of Treatment \n',
+     extra: 'These services have been approved by the health Plan or previously did not required authorization'}
   ];
   selectedValue: string;
   treatmentType: ILevelOne;
+  newTreatment: boolean;
+  yesNoAnswers: string[] = ['Yes', 'No'];
+  treatments: ITreatment[] = [
+    {id: 1, quexText: 'Treatment Extension \n', extra: 'This treatment has been previously reviewed by AIM'},
+    {id: 2, quexText: 'Continuation of Treatment \n',
+     extra: 'These services have been approved by the health Plan or previously did not required authorization'}
+  ];
 
   constructor(
     private formBuilder: FormBuilder,
@@ -49,6 +60,7 @@ export class QuestionsComponent implements OnInit {
       datePrgStart: new FormControl(new Date('1/1/2021')),
       vanillaFlag: true,
       badgeflag: false,
+      newTreatment: null,
       treatmentType: new FormControl(null),
     });
   }
@@ -56,6 +68,7 @@ export class QuestionsComponent implements OnInit {
   ngOnInit() {
     this.badgeflag = false;
     this.readyflag = false;
+    this.finishflag = false;
     this.EvalResults = { coCDetermination: '', levelOne: '', levelTwo: '', levelThree: '', badgeFlag: null, extra: ''};
     this.levelClinical = 'Not Met';
     this.dateEntry = this.form.value.dateEntry;
@@ -102,13 +115,18 @@ export class QuestionsComponent implements OnInit {
       this.datePrgStart = this.form.value.datePrgStart;
       this.vanillaFlag = this.form.value.vanillaFlag;
       this.treatmentType = this.form.value.treatmentType;
-      if (this.treatmentType) {
+      if (this.finishflag) {
+        this.tt = 0;
+        if (this.newTreatment === false) {
+          this.tt = this.treatmentType.id;
+        }
+        console.log('passing this to getQs -> tt value = ' + this.tt.toString());
         this.restApi.getQuestionsWithCriteriaAsync(
         this.dateEntry,
         this.dateOS,
         this.datePrgStart,
         this.vanillaFlag,
-        this.treatmentType.id).then(questions => {
+        this.tt).then(questions => {
           this.questionList = questions ? questions : [];
           this.addCheckboxes();
           if (questions) {
@@ -116,6 +134,8 @@ export class QuestionsComponent implements OnInit {
             console.log('loadQuestionsWithCriteriaAsync Results - ' + questions.length);
           }
         });
+      } else {
+        console.log('NOT tt');
       }
     }
   }
@@ -156,7 +176,7 @@ export class QuestionsComponent implements OnInit {
     this.unCheckAll();
     this.cocResult = null;
     this.badgeflag = false;
-    //this.vanillaFlag = true;
+    // this.vanillaFlag = true;
   }
 
   submit() {
@@ -166,7 +186,12 @@ export class QuestionsComponent implements OnInit {
       .map((v, i) => v ? this.questionList[i] : null )
       .filter(v => v !== null);
     console.log(selectedQuestionIds);
-    this.restApi.getCoCResultAsync(selectedQuestionIds, this.treatmentType.id).then(x => {
+    this.tt = 0;
+    this.treatmentType = this.form.value.treatmentType;
+    if (this.newTreatment === false) {
+      this.tt = this.treatmentType.id;
+    }
+    this.restApi.getCoCResultAsync(selectedQuestionIds, this.tt).then(x => {
       this.EvalResults = x;
       this.EvalResults.levelOne = x.levelOne;
       if (x.levelTwo === 'Met' && x.levelThree === 'Met') {
@@ -229,11 +254,18 @@ export class QuestionsComponent implements OnInit {
   onTreatmentTypeChange(event: MatSelectionListChange) {
     console.log('in onTreatmentTypeChange');
     console.log('selectedOptions:', event.source._value);
-    this.treatmentType = this.form.value.treatmentType;
-    this.selectedValue = this.treatmentType.extra;
-    console.log('selectedValue' + this.selectedValue);
-    this.readyflag = true;
-    this.loadQuestionsWithCriteriaAsync();
+    if (event.source._value) {
+      this.treatmentType = this.form.value.treatmentType;
+      this.selectedValue = this.treatmentType.extra;
+      console.log('selectedValue' + this.selectedValue);
+      this.readyflag = true;
+      this.finishflag = true;
+      this.loadQuestionsWithCriteriaAsync();
+    } else {
+      this.finishflag = false;
+      this.selectedValue = '';
+      this.questionList = [];
+    }
     this.resetCriteria();
   }
 
@@ -247,6 +279,24 @@ export class QuestionsComponent implements OnInit {
       console.log(checkbox);
       // console.log(checkbox.checked);
       this.vanillaFlag = !checkbox;
+  }
+
+  radioChange($event: MatRadioChange) {
+    console.log('in radioChange');
+    console.log($event.source.name, $event.value);
+    this.resetCriteria();
+    if ($event.value === 'Yes') {
+      this.newTreatment = true;
+      this.finishflag = true;
+      this.form.controls.treatmentType.reset();
+      this.selectedValue = '';
+    } else {
+      this.newTreatment = false;
+      this.finishflag = false;
+      this.CheckAndReload();
+    }
+    // this.CheckAndReload();
+    console.log('newTreatment flag = ' + this.newTreatment);
   }
 
 }
