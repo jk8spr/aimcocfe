@@ -34,8 +34,8 @@ export class QuestionsComponent implements OnInit {
   finishflag: boolean;
   tt: number;
   levelZeroList: ILevelOne[] = [
-    // {id: 0, quexText: 'New Treatment \n',
-    //  extra: 'Patient is receiving this treatment for the first time.  This includes additions to, removals, or changes in administration of the drugs from a previous treatment Plan.'},
+    {id: 0, quexText: 'New Treatment \n',
+     extra: 'Patient is receiving this treatment for the first time.  This includes additions to, removals, or changes in administration of the drugs from a previous treatment Plan.'},
     {id: 1, quexText: 'Treatment Extension \n', extra: 'This treatment has been previously reviewed by AIM'},
     {id: 2, quexText: 'Continuation of Treatment \n',
      extra: 'These services have been approved by the health Plan or previously did not required authorization'}
@@ -80,7 +80,8 @@ export class QuestionsComponent implements OnInit {
       this.datePrgStart) {
       this.readyflag = true;
     }
-    this.loadQuestionsWithCriteriaAsync();
+    this.CheckAndReload();
+    // this.loadQuestionsWithCriteriaAsync();
   }
 
   // loadQuestions() {
@@ -116,10 +117,10 @@ export class QuestionsComponent implements OnInit {
       this.vanillaFlag = this.form.value.vanillaFlag;
       this.treatmentType = this.form.value.treatmentType;
       if (this.finishflag) {
-        this.tt = 0;
-        if (this.newTreatment === false) {
-          this.tt = this.treatmentType.id;
-        }
+        // this.tt = 0;
+        // if (this.newTreatment === false) {
+        this.tt = this.treatmentType.id;
+        // }
         console.log('passing this to getQs -> tt value = ' + this.tt.toString());
         this.restApi.getQuestionsWithCriteriaAsync(
         this.dateEntry,
@@ -186,11 +187,11 @@ export class QuestionsComponent implements OnInit {
       .map((v, i) => v ? this.questionList[i] : null )
       .filter(v => v !== null);
     console.log(selectedQuestionIds);
-    this.tt = 0;
+    // this.tt = 0;
     this.treatmentType = this.form.value.treatmentType;
-    if (this.newTreatment === false) {
-      this.tt = this.treatmentType.id;
-    }
+    // if (this.newTreatment === false) {
+    this.tt = this.treatmentType.id;
+    // }
     this.restApi.getCoCResultAsync(selectedQuestionIds, this.tt).then(x => {
       this.EvalResults = x;
       this.EvalResults.levelOne = x.levelOne;

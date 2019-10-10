@@ -8,7 +8,7 @@
     <h4>Attestation</h4>
     <form [formGroup]="form" (ngSubmit)="submit()">
 
-      <div>
+      <!-- <div>
         <label><b>New Treatment</b></label><br/>
         <label style='width: 300px; align-content:center'>Patient is receiving this treatment for the first time.  This includes additions to, removals, or changes in administration of the drugs from a previous treatment Plan.</label><br/>
         <mat-radio-group class="tp-radio-group" formControlName="newTreatment" (change)="radioChange($event)" >
@@ -17,14 +17,15 @@
             {{yn}}
           </mat-radio-button>
         </mat-radio-group>
-      </div>
+      </div> -->
+
       <!-- <div *ngIf="!questionList">
         <button [disabled]="!readyflag" class="btn btn-outline-primary btn-sm" (click)="CheckAndReload()" >Refresh questions list</button>
       </div> -->
-      <div *ngIf="newTreatment != null && !newTreatment">
+      <!-- <div *ngIf="newTreatment != null && !newTreatment"> -->
         <div *ngIf="questionList">
           <p><b>Treatment Type</b></p>
-          <mat-select style="width:20%; margin: 1rem 0; white-space: pre-line;" placeholder = "Select Treatment Type"
+          <mat-select style="width:30%; margin: 1rem 0; white-space: pre-line;" placeholder = "Select Treatment Type"
             (selectionChange)="onTreatmentTypeChange($event)"
             formControlName="treatmentType"
             matTooltip='Click to select Treatment type' required #select>
@@ -73,9 +74,9 @@
             </tbody>
           </table>
         </div>
-      </div>
-      <div *ngIf="newTreatment != null">
-          <button [disabled]="(newTreatment == null)"
+      <!-- </div> -->
+      <div *ngIf="treatmentType != null">
+          <button [disabled]="(treatmentType == null)"
                   class="btn btn-outline-primary btn-sm">Submit</button>
       </div>
   </form>
